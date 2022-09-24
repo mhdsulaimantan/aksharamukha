@@ -1,17 +1,15 @@
-from aksharamukha import transliterate
-from flask import Flask, jsonify, request, redirect
-from flask_cors import CORS
-import re
-from aksharamukha import Convert,PostOptions,PostProcess,PreProcess, GeneralMap
-import json
-import requests
 import html
-import itertools
-from collections import Counter
-import unicodedata
+import json
+import re
 import io
-
-from aksharamukha.transliterate import convert, unique_everseen, removeA, auto_detect, detect_preoptions, get_semitic_json
+import requests
+from aksharamukha import (Convert, GeneralMap, PostOptions, PostProcess,
+                          PreProcess, transliterate)
+from aksharamukha.transliterate import (auto_detect, convert,
+                                        detect_preoptions, get_semitic_json,
+                                        removeA, unique_everseen)
+from flask import Flask, jsonify, redirect, request, send_file
+from flask_cors import CORS
 
 app = Flask(__name__)
 CORS(app)
@@ -593,9 +591,33 @@ def convert_post():
 
     return text
 
+@app.route('/api/convert_docx', methods=['POST', 'GET'])
+def convert_docx():
+    # TODO remove these lines after adding convert_docx_files method 
+    # to transliterate source code in aksharamukha_python repo
+    
+    # local imports
+    import sys
+    import os
+    # The path to the aksharamukha_python package in system
+    sys.path.append(os.path.abspath(r"..\.."))
+    from aksharamukha_python.aksharamukha.transliterate import convert_docx_files
+    #################################
+
+    # write file in-memory stream
+    file = io.BytesIO(request.files['docxFile'].read())
+
+    new_zip_file = convert_docx_files(request.form['source'], request.form['target'], file, request.form['nativize'],
+        request.form['preOptions'], request.form['postOptions'])
+    
+    return send_file(new_zip_file,
+                    download_name=request.form['fileName'],
+                    mimetype='application/zip')
+
 @app.route('/api/convert_xml', methods=['POST', 'GET'])
 def convert_xml():
     import copy
+
     from lxml import etree
 
     if 'text' in request.json:
