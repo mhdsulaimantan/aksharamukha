@@ -3588,6 +3588,30 @@ export const ScriptMixin = {
           })
       })
     },
+    convertDocxAsync: function (src, tgt, file, sourcePreserve, optionsPost, optionsPre) {
+      return new Promise(resolve => {
+        var formData = new FormData()
+        formData.append('source', src)
+        formData.append('target', tgt)
+        formData.append('docxFile', file.docxFile)
+        formData.append('fileName', file.name)
+        formData.append('nativize', !sourcePreserve)
+        formData.append('postOptions', optionsPost)
+        formData.append('preOptions', optionsPre)
+        this.apiCall.post('/convert_docx', formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          },
+          responseType: 'blob'
+        })
+          .then(function (response) {
+            resolve(response.data)
+          })
+          .catch(function (error) {
+            console.log(error)
+          })
+      })
+    },
     convertXMLAsync: function (src, tgt, txt, sourcePreserve, optionsPost, optionsPre) {
       return new Promise(resolve => {
         var data = {
