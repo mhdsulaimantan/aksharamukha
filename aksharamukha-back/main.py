@@ -601,13 +601,13 @@ def convert_docx():
     import os
     # The path to the aksharamukha_python package in system
     sys.path.append(os.path.abspath(r"..\.."))
-    from aksharamukha_python.aksharamukha.transliterate import convert_docx_files
+    from aksharamukha_python.aksharamukha.transliterate import convert_docx
     #################################
 
     # write file in-memory stream
     file = io.BytesIO(request.files['docxFile'].read())
 
-    new_zip_file = convert_docx_files(request.form['source'], request.form['target'], file, request.form['nativize'],
+    new_zip_file = convert_docx(request.form['source'], request.form['target'], file, request.form['nativize'],
         request.form['preOptions'], request.form['postOptions'])
     
     return send_file(new_zip_file,
