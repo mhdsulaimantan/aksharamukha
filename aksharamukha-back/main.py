@@ -593,24 +593,28 @@ def convert_post():
 
 @app.route('/api/convert_docx', methods=['POST', 'GET'])
 def convert_docx():
-    # TODO remove these lines after adding convert_docx_files method 
-    # to transliterate source code in aksharamukha_python repo
+    # TODO remove the following imports after having merged 
+    # aksharamukha_python.aksharamukha.ConvertDocx
     
     # local imports
     import sys
     import os
     # The path to the aksharamukha_python package in system
     sys.path.append(os.path.abspath(r"..\.."))
-    from aksharamukha_python.aksharamukha.transliterate import convert_docx
+    from aksharamukha_python.aksharamukha.ConvertDocx import convert_docx
     #################################
 
     # write file in-memory stream
     file = io.BytesIO(request.files['docxFile'].read())
-
-    new_zip_file = convert_docx(request.form['source'], request.form['target'], file, request.form['nativize'],
-        request.form['preOptions'], request.form['postOptions'])
+    new_file = convert_docx(request.form['source'], 
+                            request.form['target'], 
+                            file, 
+                            request.form['nativize'],
+                            request.form['preOptions'], 
+                            request.form['postOptions'],
+                            api=True)
     
-    return send_file(new_zip_file,
+    return send_file(new_file,
                     download_name=request.form['fileName'],
                     mimetype='application/zip')
 
