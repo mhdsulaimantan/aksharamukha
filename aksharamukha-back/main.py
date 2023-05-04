@@ -3,7 +3,7 @@ import json
 import re
 import io
 import requests
-from aksharamukha import (Convert, GeneralMap, PostOptions, PostProcess,
+from aksharamukha import (Convert, ConvertDocx, GeneralMap, PostOptions, PostProcess,
                           PreProcess, transliterate)
 from aksharamukha.transliterate import (auto_detect, convert,
                                         detect_preoptions, get_semitic_json,
@@ -593,26 +593,15 @@ def convert_post():
 
 @app.route('/api/convert_docx', methods=['POST', 'GET'])
 def convert_docx():
-    # TODO remove the following imports after having merged 
-    # aksharamukha_python.aksharamukha.ConvertDocx
-    
-    # local imports
-    import sys
-    import os
-    # The path to the aksharamukha_python package in system
-    sys.path.append(os.path.abspath(r"..\.."))
-    from aksharamukha_python.aksharamukha.ConvertDocx import convert_docx
-    #################################
-
     # write file in-memory stream
     file = io.BytesIO(request.files['docxFile'].read())
-    new_file = convert_docx(request.form['source'], 
+    new_file = ConvertDocx.convert_docx(request.form['source'], 
                             request.form['target'], 
                             file, 
                             request.form['nativize'],
                             request.form['preOptions'], 
                             request.form['postOptions'],
-                            api=True)
+                            is_api_mode=True)
     
     return send_file(new_file,
                     download_name=request.form['fileName'],
